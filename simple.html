@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Vox AI | Your 24/7 AI Sales Agent</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@200;400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #050308;
+            --text-main: #ededed;
+            --accent-1: #8b5cf6;
+            --accent-2: #06b6d4;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        h1, h2, h3, h4, .font-outfit {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .film-grain {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0.05;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        .glow-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(140px);
+            opacity: 0.12;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .glow-1 { top: -10%; right: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, var(--accent-1) 0%, transparent 70%); }
+        .glow-2 { bottom: -20%; left: -10%; width: 60vw; height: 60vw; background: radial-gradient(circle, var(--accent-2) 0%, transparent 70%); }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .reveal-delay-1 { transition-delay: 0.1s; }
+        .reveal-delay-2 { transition-delay: 0.2s; }
+        .reveal-delay-3 { transition-delay: 0.3s; }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: #222; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #444; }
+
+        .feature-card {
+            border: 1px solid rgba(255,255,255,0.06);
+            background: rgba(255,255,255,0.03);
+            backdrop-filter: blur(12px);
+            transition: all 0.4s ease;
+        }
+        .feature-card:hover {
+            border-color: rgba(6, 182, 212, 0.3);
+            background: rgba(255,255,255,0.05);
+        }
+
+        .bullet-check::before {
+            content: "\2713";
+            color: #06b6d4;
+            font-weight: 700;
+            margin-right: 0.75rem;
+        }
+
+        .compare-row { transition: background 0.3s ease; }
+        .compare-row:hover { background: rgba(255,255,255,0.03); }
+    </style>
+</head>
+<body class="relative selection:bg-violet-500/30 selection:text-white">
+
+    <!-- Background Video -->
+    <video id="bg-video" autoplay muted loop playsinline webkit-playsinline
+        style="position:fixed;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0;"
+        preload="auto">
+        <source src="https://d1yei2z3i6k35z.cloudfront.net/10816672/69b21c18dfe8d_dynamic-blue-sound-waves-in-motion-2026-01-28-04-50-43-utc.mp4" type="video/mp4">
+    </video>
+    <div style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(5,3,8,0.88);z-index:1;pointer-events:none;"></div>
+
+    <div class="film-grain"></div>
+    <div class="glow-orb glow-1"></div>
+    <div class="glow-orb glow-2"></div>
+
+    <!-- Nav -->
+    <nav class="fixed top-0 w-full z-40 px-6 py-6 flex justify-between items-center">
+        <div class="font-outfit font-bold tracking-[0.2em] text-sm uppercase text-white/70">Agent <span class="text-white">Vox AI</span></div>
+        <div class="flex items-center gap-3">
+            <span class="text-xs tracking-widest text-cyan-400/80 uppercase font-outfit">Listening</span>
+            <div class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_12px_rgba(6,182,212,0.8)]"></div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="relative z-10 min-h-screen flex flex-col justify-center items-center px-6 overflow-hidden">
+        <div class="text-center max-w-4xl mx-auto mt-20">
+            <h1 class="reveal font-outfit text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter uppercase leading-none mb-8">
+                <span class="block text-transparent bg-clip-text bg-gradient-to-br from-white via-violet-200 to-violet-900">AGENT VOX</span>
+            </h1>
+            <p class="reveal reveal-delay-1 text-xl md:text-2xl text-gray-300 font-light leading-relaxed max-w-2xl mx-auto">
+                An AI phone agent that answers every call, books appointments, follows up automatically, and remembers every customer &mdash; so you never lose another lead.
+            </p>
+            <div class="reveal reveal-delay-2 mt-16 mx-auto w-[1px] h-20 bg-gradient-to-b from-cyan-400 to-transparent"></div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="relative z-10 pb-20">
+        <div class="max-w-5xl mx-auto px-6">
+
+            <!-- Section: Never Miss -->
+            <section class="reveal py-16 md:py-24 border-t border-white/5">
+                <div class="mb-6">
+                    <span class="text-cyan-400 text-sm font-outfit font-bold tracking-[0.3em] uppercase">Never Miss Another Call</span>
+                </div>
+                <h2 class="text-3xl md:text-4xl font-outfit font-semibold text-white mb-6 leading-tight">
+                    24/7 coverage. Zero sick days. Zero turnover.
+                </h2>
+                <p class="text-lg text-gray-400 font-light leading-relaxed mb-8 max-w-3xl">
+                    Every call is answered with the same warm, professional standard &mdash; at 2am, on holidays, during your busiest season. No training new hires. No staffing gaps. No voicemail black holes where leads go to die.
+                </p>
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div class="feature-card rounded-2xl p-6 text-center">
+                        <div class="text-3xl font-outfit font-bold text-cyan-400 mb-2">24/7</div>
+                        <p class="text-sm text-gray-400">Always answering</p>
+                    </div>
+                    <div class="feature-card rounded-2xl p-6 text-center">
+                        <div class="text-3xl font-outfit font-bold text-cyan-400 mb-2">0%</div>
+                        <p class="text-sm text-gray-400">Turnover rate</p>
+                    </div>
+                    <div class="feature-card rounded-2xl p-6 text-center">
+                        <div class="text-3xl font-outfit font-bold text-cyan-400 mb-2">67%</div>
+                        <p class="text-sm text-gray-400">Cost savings vs. staff</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section: Remembers -->
+            <section class="reveal py-16 md:py-24 border-t border-white/5">
+                <div class="mb-6">
+                    <span class="text-cyan-400 text-sm font-outfit font-bold tracking-[0.3em] uppercase">Your AI Remembers Every Caller</span>
+                </div>
+                <h2 class="text-3xl md:text-4xl font-outfit font-semibold text-white mb-6 leading-tight">
+                    Call on Tuesday, follow up Friday &mdash; your agent already knows the context.
+                </h2>
+                <p class="text-lg text-gray-400 font-light leading-relaxed mb-8 max-w-3xl">
+                    Every other voice AI platform treats each call like it's the first. Agent Vox remembers every caller, what they said, what they need, and what happened last time. A prospect mentions a competitor's quote? Next time they call, your agent already knows &mdash; without being told.
+                </p>
+                <p class="text-base text-gray-500 italic">
+                    No competitor has cross-call memory. This is the single biggest differentiator.
+                </p>
+            </section>
+
+            <!-- Section: Books -->
+            <section class="reveal py-16 md:py-24 border-t border-white/5">
+                <div class="mb-6">
+                    <span class="text-cyan-400 text-sm font-outfit font-bold tracking-[0.3em] uppercase">Books While They're On The Line</span>
+                </div>
+                <h2 class="text-3xl md:text-4xl font-outfit font-semibold text-white mb-6 leading-tight">
+                    Checks your calendar, finds a time, and confirms &mdash; before they hang up.
+                </h2>
+                <p class="text-lg text-gray-400 font-light leading-relaxed mb-8 max-w-3xl">
+                    Integrates with Google Calendar, Cal.com, and Calendly. The agent checks real-time availability and books the appointment during the call. No "we'll call you back." No lead lost between the promise and the follow-up.
+                </p>
+            </section>
+
+            <!-- Section: Closes -->
+            <section class="reveal py-16 md:py-24 border-t border-white/5">
+                <div class="mb-6">
+                    <span class="text-cyan-400 text-sm font-outfit font-bold tracking-[0.3em] uppercase">Closes, Not Just Answers</span>
+                </div>
+                <h2 class="text-3xl md:text-4xl font-outfit font-semibold text-white mb-6 leading-tight">
+                    Qualifies leads, handles objections, and books the deal.
+                </h2>
+                <p class="text-lg text-gray-400 font-light leading-relaxed mb-8 max-w-3xl">
+                    Most voice AI gives you a receptionist. Agent Vox gives you a closer. It qualifies by service type, urgency, coverage area, and budget. It handles objections with proven talk tracks. It escalates when it should and books when it can.
+                </p>
+                <ul class="space-y-3 text-gray-300 max-w-2xl">
+                    <li class="bullet-check">Qualifies leads by your specific criteria</li>
+                    <li class="bullet-check">Handles common objections automatically</li>
+                    <li class="bullet-check">Knows when to book vs. when to escalate to a human</li>
+                    <li class="bullet-check">Works on your script, your rules, your brand voice</li>
+                </ul>
+            </section>
+
+            <!-- Section: Follow Up -->
+            <section class="reveal py-16 md:py-24 border-t border-white/5">
+                <div class="mb-6">
+                    <span class="text-cyan-400 text-sm font-outfit font-bold tracking-[0.3em] uppercase">Automatic Follow-Up</span>
+                </div>
+                <h2 class="text-3xl md:text-4xl font-outfit font-semibold text-white mb-6 leading-tight">
+                    Missed calls, no-shows, and unsent quotes &mdash; all followed up automatically.
+                </h2>
+                <p class="text-lg text-gray-400 font-light leading-relaxed mb-8 max-w-3xl">
+                    Agent Vox doesn't just wait for inbound. It calls back missed calls, confirms appointments, follows up on quotes, and re-engages no-shows. Automated outbound with smart scheduling, retry logic, and calling-hours enforcement.
+                </p>
+                <div class="feature-card rounded-2xl p-6 max-w-xl">
+                    <p class="text-gray-300 font-light"><span class="text-white font-medium">Real example:</span> A roofing company sends quotes but doesn't follow up. Close rate: low. Add automatic follow-up calls with objection handling? Close rate jumps.</p>
+                </div>
+            </section>
+
+            <!-- Section: Bilingual -->
+            <section class="reveal py-16 md:py-24 border-t border-white/5">
+                <div class="mb-6">
+                    <span class="text-cyan-400 text-sm font-outfit font-bold tracking-[0.3em] uppercase">English & Spanish</span>
+                </div>
+                <h2 class="text-3xl md:text-4xl font-outfit font-semibold text-white mb-6 leading-tight">
+                    Fluent in both languages. Switches naturally.
+                </h2>
+                <p class="text-lg text-gray-400 font-light leading-relaxed mb-8 max-w-3xl">
+                    No awkward language toggles. The agent detects the customer's language and responds naturally in English or Spanish with the same warm, professional tone. For home services &mdash; plumbing, roofing, HVAC &mdash; this isn't a nice-to-have. It doubles your addressable market.
+                </p>
+            </section>
+
+            <!-- Section: Multi-Channel -->
+            <section class="reveal py-16 md:py-24 border-t border-white/5">
+                <div class="mb-6">
+                    <span class="text-cyan-400 text-sm font-outfit font-bold tracking-[0.3em] uppercase">One Inbox For Everything</span>
+                </div>
+                <h2 class="text-3xl md:text-4xl font-outfit font-semibold text-white mb-6 leading-tight">
+                    Voice, text, email, WhatsApp, web chat &mdash; all in one place.
+                </h2>
+                <p class="text-lg text-gray-400 font-light leading-relaxed mb-8 max-w-3xl">
+                    A customer calls Tuesday and texts Thursday. Your agent knows both conversations happened. Every channel feeds into one timeline per contact. No context lost. No repeated questions. Same agent, every channel.
+                </p>
+            </section>
+
+            <!-- Section: Compliance -->
+            <section class="reveal py-16 md:py-24 border-t border-white/5">
+                <div class="mb-6">
+                    <span class="text-cyan-400 text-sm font-outfit font-bold tracking-[0.3em] uppercase">Compliance Built In</span>
+                </div>
+                <h2 class="text-3xl md:text-4xl font-outfit font-semibold text-white mb-6 leading-tight">
+                    Outbound campaigns that follow the rules automatically.
+                </h2>
+                <p class="text-lg text-gray-400 font-light leading-relaxed mb-8 max-w-3xl">
+                    Timezone-aware calling hours. Do-Not-Call registry checks. Opt-out management. Two-party consent detection. Abuse monitoring. Most competitors leave compliance as your problem. We built it into the system.
+                </p>
+                <ul class="space-y-3 text-gray-300 max-w-2xl">
+                    <li class="bullet-check">TCPA pre-call checks on every dial</li>
+                    <li class="bullet-check">DNC registry integration</li>
+                    <li class="bullet-check">Automatic calling-hours enforcement by timezone</li>
+                    <li class="bullet-check">Every call recorded and transcribed for audit</li>
+                </ul>
+            </section>
+
+            <!-- Section: White Label -->
+            <section class="reveal py-16 md:py-24 border-t border-white/5">
+                <div class="mb-6">
+                    <span class="text-cyan-400 text-sm font-outfit font-bold tracking-[0.3em] uppercase">Your Brand, Your Product</span>
+                </div>
+                <h2 class="text-3xl md:text-4xl font-outfit font-semibold text-white mb-6 leading-tight">
+                    White-label it. Set your own pricing. Bill your clients directly.
+                </h2>
+                <p class="text-lg text-gray-400 font-light leading-relaxed mb-8 max-w-3xl">
+                    Custom domain, your logo, your colors, your company name. Remove all "powered by" branding. Set your own per-minute pricing and included minutes. Monthly invoices auto-generated. Turn Agent Vox into your own product line.
+                </p>
+                <div class="feature-card rounded-2xl p-6 max-w-xl">
+                    <p class="text-gray-300 font-light"><span class="text-white font-medium">Agency opportunity:</span> ~100K GoHighLevel agencies just lost their AI voice calling integration. That window is 3-6 months. We're building for it now.</p>
+                </div>
+            </section>
+
+            <!-- Section: Ready Fast -->
+            <section class="reveal py-16 md:py-24 border-t border-white/5">
+                <div class="mb-6">
+                    <span class="text-cyan-400 text-sm font-outfit font-bold tracking-[0.3em] uppercase">Ready in Minutes</span>
+                </div>
+                <h2 class="text-3xl md:text-4xl font-outfit font-semibold text-white mb-6 leading-tight">
+                    8 pre-built templates. AI prompt builder. Test it before you go live.
+                </h2>
+                <p class="text-lg text-gray-400 font-light leading-relaxed mb-8 max-w-3xl">
+                    Pick a template &mdash; Appointment Setter, Lead Qualifier, Follow-Up Agent, Receptionist, and more. Customize with plain English descriptions. Call yourself to hear the agent before it goes live. No code. No consultants.
+                </p>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="feature-card rounded-2xl p-6">
+                        <h4 class="font-outfit text-white font-medium mb-2">8 Templates</h4>
+                        <p class="text-sm text-gray-400">Appointment Setter, Receptionist, Lead Qualifier, Follow-Up, Survey, Recruiter, Payment Reminder, Event Registrar.</p>
+                    </div>
+                    <div class="feature-card rounded-2xl p-6">
+                        <h4 class="font-outfit text-white font-medium mb-2">AI Prompt Builder</h4>
+                        <p class="text-sm text-gray-400">Describe what you want in plain English. The AI writes the agent prompt for you.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section: Integrations -->
+            <section class="reveal py-16 md:py-24 border-t border-white/5">
+                <div class="mb-6">
+                    <span class="text-cyan-400 text-sm font-outfit font-bold tracking-[0.3em] uppercase">Plugs Into Your Stack</span>
+                </div>
+                <h2 class="text-3xl md:text-4xl font-outfit font-semibold text-white mb-6 leading-tight">
+                    GoHighLevel, Zapier, and any tool you already use.
+                </h2>
+                <p class="text-lg text-gray-400 font-light leading-relaxed mb-8 max-w-3xl">
+                    Native GoHighLevel integration &mdash; trigger calls, sync contacts, push outcomes, book calendar. Zapier app with triggers and actions. REST API with webhooks. Agent Vox fits into your workflow, not the other way around.
+                </p>
+            </section>
+
+            <!-- Section: Smarter -->
+            <section class="reveal py-16 md:py-24 border-t border-white/5">
+                <div class="mb-6">
+                    <span class="text-cyan-400 text-sm font-outfit font-bold tracking-[0.3em] uppercase">Gets Smarter Over Time</span>
+                </div>
+                <h2 class="text-3xl md:text-4xl font-outfit font-semibold text-white mb-6 leading-tight">
+                    Predicts which leads will convert. Suggests what to say differently.
+                </h2>
+                <p class="text-lg text-gray-400 font-light leading-relaxed mb-8 max-w-3xl">
+                    Over time, Agent Vox learns which types of customers convert and which don't. It prioritizes your highest-probability leads. Weekly reports compare winning vs. losing calls and suggest improvements. A/B test different scripts automatically.
+                </p>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Comparison -->
+    <section class="relative z-10 py-24 md:py-32 px-6 bg-gradient-to-b from-transparent via-violet-950/20 to-black">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-16">
+                <h3 class="reveal font-outfit text-sm tracking-[0.4em] uppercase text-cyan-400 font-bold mb-4">Quick Comparison</h3>
+                <h2 class="reveal reveal-delay-1 text-3xl md:text-4xl font-outfit text-white">What You Get vs. The Alternatives</h2>
+            </div>
+
+            <div class="reveal reveal-delay-2 space-y-3">
+                <div class="compare-row grid grid-cols-3 gap-4 p-5 rounded-xl border border-white/5 items-center">
+                    <span class="text-gray-300 font-medium">Voicemail</span>
+                    <span class="text-gray-500 text-sm text-center">Captures a message. That's it. No scheduling, no qualifying, no follow-up.</span>
+                    <span class="text-red-400 text-right text-sm font-outfit">Dead end</span>
+                </div>
+                <div class="compare-row grid grid-cols-3 gap-4 p-5 rounded-xl border border-white/5 items-center">
+                    <span class="text-gray-300 font-medium">Receptionist</span>
+                    <span class="text-gray-500 text-sm text-center">Answers during business hours. Calls in sick. Inconsistent quality. Expensive.</span>
+                    <span class="text-yellow-400 text-right text-sm font-outfit">Limited</span>
+                </div>
+                <div class="compare-row grid grid-cols-3 gap-4 p-5 rounded-xl border border-white/5 items-center">
+                    <span class="text-gray-300 font-medium">Other AI Voice</span>
+                    <span class="text-gray-500 text-sm text-center">Answers calls but forgets everything. No memory. No follow-up. No learning.</span>
+                    <span class="text-yellow-400 text-right text-sm font-outfit">Basic</span>
+                </div>
+                <div class="compare-row grid grid-cols-3 gap-4 p-5 rounded-xl border border-cyan-500/20 bg-cyan-900/10 items-center">
+                    <span class="text-cyan-300 font-medium font-outfit">Agent Vox AI</span>
+                    <span class="text-gray-300 text-sm text-center">Answers, qualifies, books, follows up, remembers, and gets smarter every call.</span>
+                    <span class="text-cyan-400 text-right text-sm font-outfit font-bold">Full coverage</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bottom Line -->
+    <section class="relative z-10 py-24 md:py-32 px-6 border-t border-white/10 bg-black backdrop-blur-3xl">
+        <div class="max-w-4xl mx-auto text-center">
+            <h3 class="reveal font-outfit text-sm tracking-[0.4em] uppercase text-violet-400 font-bold mb-10">The Bottom Line</h3>
+            <p class="reveal reveal-delay-1 text-2xl md:text-4xl text-gray-100 leading-snug font-outfit font-light mb-12">
+                Every other voice AI forgets the call the moment it ends.<br><br>
+                <span class="font-medium text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-cyan-400">Agent Vox builds a relationship with every caller that gets stronger over time.</span>
+            </p>
+            <div class="reveal reveal-delay-2 p-8 md:p-10 rounded-3xl bg-white/5 border border-white/10 shadow-2xl backdrop-blur-md inline-block">
+                <p class="text-lg md:text-xl text-gray-300 font-inter font-light">
+                    Answer every call. Book every appointment. Follow up on every lead. Remember every customer. &mdash; At a fraction of the cost of hiring staff.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="relative z-10 border-t border-white/5 py-10 text-center text-sm text-gray-600 font-inter tracking-widest uppercase bg-black">
+        &copy; <script>document.write(new Date().getFullYear())</script> AGENT VOX AI
+    </footer>
+
+    <script>
+        // Scroll Reveal
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                } else {
+                    entry.target.classList.remove('active');
+                }
+            });
+        }, { threshold: 0.15 });
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // Safari + mobile autoplay fix
+        const video = document.getElementById('bg-video');
+        video.muted = true;
+        video.setAttribute('muted', '');
+        video.setAttribute('playsinline', '');
+        const playPromise = video.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(() => {
+                document.addEventListener('touchstart', function handler() {
+                    video.play();
+                    document.removeEventListener('touchstart', handler);
+                }, { once: true });
+                document.addEventListener('click', function handler() {
+                    video.play();
+                    document.removeEventListener('click', handler);
+                }, { once: true });
+            });
+        }
+    </script>
+</body>
+</html>
