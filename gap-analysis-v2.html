@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>V2 Gap Analysis — Nedzo.ai V2 vs. Agent Vox V2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: { brand: { blue: '#3b82f6', dark: '#2563eb' } }
+                }
+            }
+        }
+    </script>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{background:#000;color:#a1a1aa;font-family:'Inter',sans-serif;overflow-x:hidden}
+        .glass-card{background:rgba(255,255,255,0.04);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.08);border-radius:24px;transition:all .4s cubic-bezier(.4,0,.2,1)}
+        .glass-card:hover{border-color:rgba(59,130,246,0.25);background:rgba(255,255,255,0.06);transform:translateY(-4px);box-shadow:0 20px 60px rgba(0,0,0,0.4),0 0 40px rgba(59,130,246,0.08)}
+        .nav-glass{background:rgba(0,0,0,0.4);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);border-bottom:1px solid rgba(255,255,255,0.06)}
+        .glow-orb{position:absolute;border-radius:50%;pointer-events:none;filter:blur(120px)}
+        .reveal{opacity:0;transform:translateY(40px);transition:all .8s cubic-bezier(.4,0,.2,1)}
+        .reveal.visible{opacity:1;transform:translateY(0)}
+        .text-gradient-white{background:linear-gradient(135deg,#fff 0%,#a1a1aa 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .text-gradient-blue{background:linear-gradient(135deg,#60a5fa 0%,#3b82f6 50%,#2563eb 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .text-gradient-amber{background:linear-gradient(135deg,#fbbf24 0%,#f59e0b 50%,#d97706 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .icon-box{background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.15);border-radius:16px;transition:all .3s ease}
+        .badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:9999px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em}
+        .section-divider{height:1px;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.06) 20%,rgba(255,255,255,0.06) 80%,transparent 100%)}
+        .data-table{width:100%;border-collapse:separate;border-spacing:0}
+        .data-table thead th{padding:14px 16px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:#71717a;text-align:left;border-bottom:1px solid rgba(255,255,255,0.06)}
+        .data-table tbody td{padding:14px 16px;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.03)}
+        .data-table tbody tr{transition:background .2s ease}
+        .data-table tbody tr:hover{background:rgba(255,255,255,0.02)}
+        .win-vox{color:#34d399;font-weight:600}
+        .win-nedzo{color:#f87171;font-weight:600}
+        .win-tie{color:#a1a1aa;font-weight:500}
+        .eroded{text-decoration:line-through;color:#52525b}
+        .delta-closed{background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:12px;padding:3px 10px;font-size:11px;color:#fbbf24;font-weight:600}
+        .delta-new{background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);border-radius:12px;padding:3px 10px;font-size:11px;color:#f87171;font-weight:600}
+        .delta-holds{background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.15);border-radius:12px;padding:3px 10px;font-size:11px;color:#34d399;font-weight:600}
+    </style>
+</head>
+<body class="antialiased selection:bg-brand-blue/30 selection:text-white">
+
+    <!-- NAVIGATION -->
+    <nav class="fixed w-full z-50 top-0 nav-glass">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <a href="#" class="flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-lg bg-brand-blue/20 border border-brand-blue/30 flex items-center justify-center">
+                        <i data-lucide="audio-waveform" class="w-4 h-4 text-brand-blue"></i>
+                    </div>
+                    <span class="text-white font-semibold text-lg">Agent Vox</span>
+                </a>
+                <div class="hidden md:flex items-center space-x-10">
+                    <a href="#landscape" class="text-[13px] text-zinc-400 hover:text-white transition-colors duration-300 font-medium">Landscape Shift</a>
+                    <a href="#eroded" class="text-[13px] text-zinc-400 hover:text-white transition-colors duration-300 font-medium">What Changed</a>
+                    <a href="#durable" class="text-[13px] text-zinc-400 hover:text-white transition-colors duration-300 font-medium">Durable Moats</a>
+                    <a href="#gaps" class="text-[13px] text-zinc-400 hover:text-white transition-colors duration-300 font-medium">Our Gaps</a>
+                    <a href="#matrix" class="text-[13px] text-zinc-400 hover:text-white transition-colors duration-300 font-medium">Head-to-Head</a>
+                    <a href="#strategy" class="text-[13px] text-zinc-400 hover:text-white transition-colors duration-300 font-medium">Strategy</a>
+                </div>
+                <span class="hidden md:flex badge bg-amber-500/10 text-amber-400 border border-amber-500/20"><i data-lucide="refresh-cw" class="w-3 h-3"></i> V2 Update</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
+        <div class="glow-orb w-[600px] h-[600px] bg-amber-500/8 top-[-200px] left-1/2 -translate-x-1/2"></div>
+        <div class="glow-orb w-[400px] h-[400px] bg-brand-blue/5 bottom-[-100px] left-[-100px]"></div>
+        <div class="glow-orb w-[300px] h-[300px] bg-red-500/5 bottom-[-100px] right-[-100px]"></div>
+        <div class="relative z-10 max-w-4xl mx-auto px-6 text-center pt-32 pb-20">
+            <div class="badge bg-amber-500/10 text-amber-400 border border-amber-500/20 mb-8"><i data-lucide="alert-triangle" class="w-3 h-3"></i> Competitive Landscape Shift</div>
+            <h1 class="text-5xl md:text-7xl font-bold text-gradient-white leading-[1.1] mb-2">Nedzo V2 <span class="text-gradient-amber">vs.</span> Vox V2</h1>
+            <p class="text-lg text-zinc-500 mb-4">The game has changed.</p>
+            <p class="text-base md:text-lg text-zinc-400 max-w-2xl mx-auto leading-relaxed mb-8">Nedzo rebuilt from Bubble.io to React/Vite/Tailwind with a custom backend. Five of our claimed advantages are gone. This is the updated competitive reality.</p>
+            <div class="flex flex-wrap justify-center gap-6 text-sm text-zinc-500 mb-12">
+                <span class="flex items-center gap-2"><i data-lucide="git-compare" class="w-4 h-4"></i> Both custom React apps now</span>
+                <span class="flex items-center gap-2"><i data-lucide="brain" class="w-4 h-4"></i> Graph memory still unique</span>
+                <span class="flex items-center gap-2"><i data-lucide="calendar" class="w-4 h-4"></i> March 19, 2026</span>
+            </div>
+
+            <!-- Score Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+                <div class="glass-card p-6 text-center">
+                    <p class="text-xs text-zinc-500 uppercase tracking-wider mb-2">Vox Advantages</p>
+                    <p class="text-4xl font-bold text-emerald-400">12</p>
+                    <p class="text-xs text-zinc-600 mt-1">structural wins</p>
+                </div>
+                <div class="glass-card p-6 text-center">
+                    <p class="text-xs text-zinc-500 uppercase tracking-wider mb-2">Nedzo Advantages</p>
+                    <p class="text-4xl font-bold text-red-400">9</p>
+                    <p class="text-xs text-zinc-600 mt-1">market + UX wins</p>
+                </div>
+                <div class="glass-card p-6 text-center">
+                    <p class="text-xs text-zinc-500 uppercase tracking-wider mb-2">Eroded Since V1</p>
+                    <p class="text-4xl font-bold text-amber-400">5</p>
+                    <p class="text-xs text-zinc-600 mt-1">advantages lost</p>
+                </div>
+                <div class="glass-card p-6 text-center">
+                    <p class="text-xs text-zinc-500 uppercase tracking-wider mb-2">Biggest Gap</p>
+                    <p class="text-2xl font-bold text-red-400">GTM</p>
+                    <p class="text-xs text-zinc-600 mt-1">0 customers vs 400+ agencies</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider max-w-7xl mx-auto"></div>
+
+    <!-- LANDSCAPE SHIFT -->
+    <section id="landscape" class="py-24 relative">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16 reveal">
+                <span class="badge bg-amber-500/10 text-amber-400 border border-amber-500/20 mb-4"><i data-lucide="refresh-cw" class="w-3 h-3"></i> Ground Truth Update</span>
+                <h2 class="text-3xl md:text-4xl font-bold text-gradient-white mt-4">Nedzo V2: What Actually Changed</h2>
+                <p class="text-zinc-400 mt-4 max-w-2xl mx-auto">Scraped March 10, 2026 at v2.nedzo.ai. This is a complete platform rewrite &mdash; not an incremental update.</p>
+            </div>
+
+            <!-- V1 vs V2 Comparison -->
+            <div class="glass-card p-2 md:p-6 overflow-x-auto mb-8 reveal">
+                <table class="data-table">
+                    <thead><tr><th style="width:22%">Aspect</th><th style="width:30%">Nedzo V1 (app.nedzo.ai)</th><th style="width:30%">Nedzo V2 (v2.nedzo.ai)</th><th style="width:18%">Impact on Vox</th></tr></thead>
+                    <tbody>
+                        <tr><td class="text-white text-sm font-medium">Framework</td><td class="text-sm">Bubble.io (no-code)</td><td class="text-sm text-amber-400">React + Vite + Tailwind</td><td><span class="delta-closed">Gap Closed</span></td></tr>
+                        <tr><td class="text-white text-sm font-medium">JS Bundle</td><td class="text-sm">~55MB Bubble runtime</td><td class="text-sm text-amber-400">Single Vite bundle (~1-5MB)</td><td><span class="delta-closed">Gap Closed</span></td></tr>
+                        <tr><td class="text-white text-sm font-medium">Backend</td><td class="text-sm">Bubble.io workflows</td><td class="text-sm text-amber-400">Custom API at api.nedzo.ai</td><td><span class="delta-closed">Gap Closed</span></td></tr>
+                        <tr><td class="text-white text-sm font-medium">Authentication</td><td class="text-sm">Email + Password (Bubble)</td><td class="text-sm text-amber-400">Magic link (passwordless)</td><td><span class="delta-new">Nedzo Ahead</span></td></tr>
+                        <tr><td class="text-white text-sm font-medium">Typography</td><td class="text-sm">Poppins + Inter</td><td class="text-sm">JetBrains Mono + Plus Jakarta Sans</td><td class="text-xs text-zinc-600">Cosmetic</td></tr>
+                        <tr><td class="text-white text-sm font-medium">Whitelabel</td><td class="text-sm">CoAlias CSS proxy</td><td class="text-sm text-amber-400">Real multi-tenant (custom codebase)</td><td><span class="delta-closed">Gap Closed</span></td></tr>
+                        <tr><td class="text-white text-sm font-medium">HIPAA Eligibility</td><td class="text-sm">Blocked by Bubble.io</td><td class="text-sm text-amber-400">Now possible (custom backend)</td><td><span class="delta-closed">Gap Closed</span></td></tr>
+                        <tr><td class="text-white text-sm font-medium">Voice Engine</td><td class="text-sm">Vapi.ai dependency</td><td class="text-sm">Still Vapi.ai</td><td><span class="delta-holds">Vox Still Wins</span></td></tr>
+                        <tr><td class="text-white text-sm font-medium">Cross-call Memory</td><td class="text-sm">None (stateless)</td><td class="text-sm">None (stateless)</td><td><span class="delta-holds">Vox Still Wins</span></td></tr>
+                        <tr><td class="text-white text-sm font-medium">Analytics Depth</td><td class="text-sm">Basic summaries</td><td class="text-sm">Basic summaries</td><td><span class="delta-holds">Vox Still Wins</span></td></tr>
+                        <tr><td class="text-white text-sm font-medium">Stripe Account</td><td class="text-sm">pk_live_51Ounu...</td><td class="text-sm">Same key</td><td class="text-xs text-zinc-600">Same entity</td></tr>
+                        <tr><td class="text-white text-sm font-medium">Social Proof</td><td class="text-sm">&ldquo;9M+ conversations&rdquo;</td><td class="text-sm text-amber-400">&ldquo;400+ Agencies joined this month&rdquo;</td><td class="text-xs text-zinc-600">First customer count claim</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Key Takeaway -->
+            <div class="glass-card p-8 reveal" style="background:rgba(245,158,11,0.04);border-color:rgba(245,158,11,0.15)">
+                <div class="flex items-center gap-3 mb-3"><i data-lucide="alert-triangle" class="w-5 h-5 text-amber-400"></i><h3 class="text-white font-semibold">The Infrastructure Advantage Is Gone</h3></div>
+                <p class="text-sm text-zinc-400">Our V1 analysis claimed 5 advantages rooted in Nedzo&rsquo;s Bubble.io limitations: real codebase, performance, HIPAA eligibility, real whitelabel, and unlimited customization. <strong class="text-amber-400">Nedzo V2 eliminates all five.</strong> Both products are now custom-built React + API applications. The competition has shifted from &ldquo;better tech stack + graph memory&rdquo; to <strong class="text-white">&ldquo;graph memory alone.&rdquo;</strong></p>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider max-w-7xl mx-auto"></div>
+
+    <!-- ERODED ADVANTAGES -->
+    <section id="eroded" class="py-24 relative">
+        <div class="glow-orb w-[500px] h-[500px] bg-amber-500/5 top-[-200px] left-[-200px]"></div>
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16 reveal">
+                <span class="badge bg-amber-500/10 text-amber-400 border border-amber-500/20 mb-4"><i data-lucide="trending-down" class="w-3 h-3"></i> Honest Assessment</span>
+                <h2 class="text-3xl md:text-4xl font-bold text-gradient-white mt-4">Advantages We Lost</h2>
+                <p class="text-zinc-400 mt-4 max-w-2xl mx-auto">Five advantages from our V1 analysis no longer hold against Nedzo V2. Acknowledging this is step one.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 reveal">
+                <div class="glass-card p-8" style="border-color:rgba(245,158,11,0.2)">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="icon-box w-12 h-12 flex items-center justify-center" style="background:rgba(245,158,11,0.08);border-color:rgba(245,158,11,0.15)"><i data-lucide="code-2" class="w-5 h-5 text-amber-400"></i></div>
+                        <div><h3 class="text-white font-semibold text-sm">&ldquo;Real Codebase&rdquo;</h3><p class="text-xs text-zinc-600">Was: Strong differentiator</p></div>
+                    </div>
+                    <p class="text-sm text-zinc-400 mb-3">We claimed &ldquo;real Python/TypeScript codebase vs no-code ceiling.&rdquo; Nedzo V2 is now React + Vite + custom API. Both are real codebases.</p>
+                    <div class="p-3 rounded-lg bg-amber-500/5 border border-amber-500/10"><p class="text-amber-400 text-xs font-semibold">NEUTRALIZED</p></div>
+                </div>
+                <div class="glass-card p-8" style="border-color:rgba(245,158,11,0.2)">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="icon-box w-12 h-12 flex items-center justify-center" style="background:rgba(245,158,11,0.08);border-color:rgba(245,158,11,0.15)"><i data-lucide="zap" class="w-5 h-5 text-amber-400"></i></div>
+                        <div><h3 class="text-white font-semibold text-sm">Performance</h3><p class="text-xs text-zinc-600">Was: 55MB vs ~1MB</p></div>
+                    </div>
+                    <p class="text-sm text-zinc-400 mb-3">Nedzo V1 loaded 55MB of Bubble.io runtime per session. V2 uses a single Vite bundle (~1-5MB). Load times are now comparable.</p>
+                    <div class="p-3 rounded-lg bg-amber-500/5 border border-amber-500/10"><p class="text-amber-400 text-xs font-semibold">NEUTRALIZED</p></div>
+                </div>
+                <div class="glass-card p-8" style="border-color:rgba(245,158,11,0.2)">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="icon-box w-12 h-12 flex items-center justify-center" style="background:rgba(245,158,11,0.08);border-color:rgba(245,158,11,0.15)"><i data-lucide="shield-check" class="w-5 h-5 text-amber-400"></i></div>
+                        <div><h3 class="text-white font-semibold text-sm">HIPAA Eligibility</h3><p class="text-xs text-zinc-600">Was: Blocked for Nedzo</p></div>
+                    </div>
+                    <p class="text-sm text-zinc-400 mb-3">Bubble.io couldn&rsquo;t sign a BAA. Custom backend at api.nedzo.ai can control data handling, encryption, and compliance. Healthcare vertical is now open to them.</p>
+                    <div class="p-3 rounded-lg bg-amber-500/5 border border-amber-500/10"><p class="text-amber-400 text-xs font-semibold">NEUTRALIZED</p></div>
+                </div>
+                <div class="glass-card p-8" style="border-color:rgba(245,158,11,0.2)">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="icon-box w-12 h-12 flex items-center justify-center" style="background:rgba(245,158,11,0.08);border-color:rgba(245,158,11,0.15)"><i data-lucide="palette" class="w-5 h-5 text-amber-400"></i></div>
+                        <div><h3 class="text-white font-semibold text-sm">Real Whitelabel</h3><p class="text-xs text-zinc-600">Was: CSS proxy vs real</p></div>
+                    </div>
+                    <p class="text-sm text-zinc-400 mb-3">V1 used CoAlias CSS proxy &mdash; browser dev tools revealed the underlying Bubble structure. V2&rsquo;s custom codebase enables genuine multi-tenant whitelabeling.</p>
+                    <div class="p-3 rounded-lg bg-amber-500/5 border border-amber-500/10"><p class="text-amber-400 text-xs font-semibold">NEUTRALIZED</p></div>
+                </div>
+                <div class="glass-card p-8" style="border-color:rgba(245,158,11,0.2)">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="icon-box w-12 h-12 flex items-center justify-center" style="background:rgba(245,158,11,0.08);border-color:rgba(245,158,11,0.15)"><i data-lucide="settings" class="w-5 h-5 text-amber-400"></i></div>
+                        <div><h3 class="text-white font-semibold text-sm">Customization Ceiling</h3><p class="text-xs text-zinc-600">Was: No-code limits them</p></div>
+                    </div>
+                    <p class="text-sm text-zinc-400 mb-3">Bubble.io imposed hard limits on data models, performance, and customization. With a custom codebase, Nedzo can now build anything. Feature velocity should increase.</p>
+                    <div class="p-3 rounded-lg bg-amber-500/5 border border-amber-500/10"><p class="text-amber-400 text-xs font-semibold">NEUTRALIZED</p></div>
+                </div>
+                <!-- New Risk -->
+                <div class="glass-card p-8" style="border-color:rgba(239,68,68,0.2)">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="icon-box w-12 h-12 flex items-center justify-center" style="background:rgba(239,68,68,0.08);border-color:rgba(239,68,68,0.15)"><i data-lucide="arrow-up-right" class="w-5 h-5 text-red-400"></i></div>
+                        <div><h3 class="text-white font-semibold text-sm">Faster Iteration Risk</h3><p class="text-xs text-zinc-600">New threat from V2</p></div>
+                    </div>
+                    <p class="text-sm text-zinc-400 mb-3">Custom codebase means Nedzo&rsquo;s dev team can now ship features faster than on Bubble.io. The feature velocity gap may close. 400+ agencies being migrated creates retention lock-in.</p>
+                    <div class="p-3 rounded-lg bg-red-500/5 border border-red-500/10"><p class="text-red-400 text-xs font-semibold">NEW RISK</p></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider max-w-7xl mx-auto"></div>
+
+    <!-- DURABLE MOATS -->
+    <section id="durable" class="py-24 relative">
+        <div class="glow-orb w-[500px] h-[500px] bg-emerald-500/5 top-[-200px] right-[-200px]"></div>
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16 reveal">
+                <span class="badge bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 mb-4"><i data-lucide="shield-check" class="w-3 h-3"></i> Still Ours</span>
+                <h2 class="text-3xl md:text-4xl font-bold text-gradient-white mt-4">What Nedzo V2 Still Cannot Replicate</h2>
+                <p class="text-zinc-400 mt-4 max-w-2xl mx-auto">Structural advantages that survived the rewrite. These require Nedzo to rebuild their data layer &mdash; not just their frontend.</p>
+            </div>
+
+            <div class="space-y-6 reveal">
+                <!-- Graph Memory -->
+                <div class="glass-card p-8 md:p-10" style="border-color:rgba(16,185,129,0.2)">
+                    <div class="flex flex-col md:flex-row gap-8">
+                        <div class="flex-shrink-0"><div class="icon-box w-16 h-16 flex items-center justify-center" style="background:rgba(16,185,129,0.08);border-color:rgba(16,185,129,0.15)"><i data-lucide="brain" class="w-7 h-7 text-emerald-400"></i></div></div>
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 mb-2"><span class="badge bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px]">Primary Moat</span><h3 class="text-white font-semibold text-xl">Graph Memory That Compounds</h3></div>
+                            <p class="text-sm text-zinc-400 mb-4">Neo4j knowledge graph stores every interaction as connected nodes. Contacts, calls, entities, objections, buying signals, competitor mentions, relationship maps. Call #5 with a prospect automatically references calls #1&ndash;4. <strong class="text-white">Nedzo V2&rsquo;s React rewrite does nothing to address stateless calls.</strong> This is a data architecture gap, not a frontend gap.</p>
+                            <div class="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
+                                <p class="text-emerald-400 text-sm font-medium mb-2">Why V2 Doesn&rsquo;t Fix This:</p>
+                                <p class="text-xs text-zinc-500">Rewriting from Bubble to React changes the UI layer. Graph memory requires a fundamentally different data model &mdash; a knowledge graph, entity extraction pipeline, and cross-session state management. You don&rsquo;t get this by switching frameworks.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Entity Extraction -->
+                <div class="glass-card p-8 md:p-10" style="border-color:rgba(16,185,129,0.15)">
+                    <div class="flex flex-col md:flex-row gap-8">
+                        <div class="flex-shrink-0"><div class="icon-box w-16 h-16 flex items-center justify-center" style="background:rgba(16,185,129,0.08);border-color:rgba(16,185,129,0.15)"><i data-lucide="scan-search" class="w-7 h-7 text-emerald-400"></i></div></div>
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 mb-2"><span class="badge bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px]">Compounds Over Time</span><h3 class="text-white font-semibold text-xl">Post-Call Intelligence Pipeline</h3></div>
+                            <p class="text-sm text-zinc-400">Claude-powered entity extraction after every call: companies, people, products, objections, buying signals &mdash; all stored as graph nodes with relationships. Nedzo V2 still produces flat call summaries. The difference: structured, queryable intelligence vs. disposable text.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Provider Transparency + Local -->
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="glass-card p-8" style="border-color:rgba(16,185,129,0.12)">
+                        <div class="flex items-center gap-3 mb-4"><i data-lucide="layers" class="w-5 h-5 text-emerald-400"></i><h3 class="text-white font-semibold">Provider Transparency + Local</h3></div>
+                        <p class="text-xs text-zinc-400 mb-3">6 TTS, 5 STT, 5+ LLM providers &mdash; user chooses. MLX Whisper, Chatterbox TTS, Ollama run fully on-device. <strong class="text-zinc-300">$0.00/min floor.</strong></p>
+                        <p class="text-xs text-zinc-600">Nedzo V2: still opaque, still cloud-only, still Vapi-dependent.</p>
+                    </div>
+                    <div class="glass-card p-8" style="border-color:rgba(16,185,129,0.12)">
+                        <div class="flex items-center gap-3 mb-4"><i data-lucide="code" class="w-5 h-5 text-emerald-400"></i><h3 class="text-white font-semibold">Developer-First API</h3></div>
+                        <p class="text-xs text-zinc-400 mb-3">132+ documented REST endpoints. OpenAPI auto-docs. Full programmatic control. Any integration partner or technical buyer chooses Vox.</p>
+                        <p class="text-xs text-zinc-600">Nedzo V2: ndz_ API keys exist but zero public documentation.</p>
+                    </div>
+                </div>
+
+                <!-- A/B Testing + Analytics + Multi-Channel -->
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="glass-card p-8">
+                        <div class="flex items-center gap-3 mb-4"><i data-lucide="split" class="w-5 h-5 text-brand-blue"></i><h3 class="text-white font-semibold text-sm">A/B Testing</h3></div>
+                        <p class="text-xs text-zinc-400 mb-3">Weighted prompt variants assigned at call start. Outcome tracking per variant. Systematic prompt optimization &mdash; no competitor has this.</p>
+                        <p class="text-xs text-zinc-600">Nedzo V2: no A/B testing.</p>
+                    </div>
+                    <div class="glass-card p-8">
+                        <div class="flex items-center gap-3 mb-4"><i data-lucide="bar-chart-3" class="w-5 h-5 text-brand-blue"></i><h3 class="text-white font-semibold text-sm">Deep Analytics</h3></div>
+                        <p class="text-xs text-zinc-400 mb-3">Funnel visualization, cohort analysis, cost tracking, agent comparison, email reports (Postmark/SendGrid). Prometheus /metrics + Grafana ready.</p>
+                        <p class="text-xs text-zinc-600">Nedzo V2: basic end-of-call summaries.</p>
+                    </div>
+                    <div class="glass-card p-8">
+                        <div class="flex items-center gap-3 mb-4"><i data-lucide="mail" class="w-5 h-5 text-brand-blue"></i><h3 class="text-white font-semibold text-sm">Multi-Channel</h3></div>
+                        <p class="text-xs text-zinc-400 mb-3">Voice + SMS (two-way) + Email (Postmark/SendGrid, HTML, delivery tracking) + Unified inbox with unread counts and cross-channel timeline.</p>
+                        <p class="text-xs text-zinc-600">Nedzo V2: voice + web widget. No SMS, no email.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider max-w-7xl mx-auto"></div>
+
+    <!-- OUR GAPS (HONEST) -->
+    <section id="gaps" class="py-24 relative">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16 reveal">
+                <span class="badge bg-red-500/10 text-red-400 border border-red-500/20 mb-4"><i data-lucide="alert-triangle" class="w-3 h-3"></i> Honest Assessment</span>
+                <h2 class="text-3xl md:text-4xl font-bold text-gradient-white mt-4">What Nedzo V2 Has That We Don&rsquo;t</h2>
+                <p class="text-zinc-400 mt-4 max-w-2xl mx-auto">These gaps have not changed since the V1 analysis. That should be concerning &mdash; 9 days, zero progress on P0.</p>
+            </div>
+
+            <!-- Existential -->
+            <div class="mb-8 reveal">
+                <h3 class="text-red-400 font-semibold text-sm uppercase tracking-wider mb-4 flex items-center gap-2"><i data-lucide="flame" class="w-4 h-4"></i> Existential &mdash; Cannot Sell Without These</h3>
+                <div class="glass-card p-2 md:p-4 overflow-x-auto">
+                    <table class="data-table">
+                        <thead><tr><th>Gap</th><th>Nedzo V2</th><th>Agent Vox V2</th><th>Effort</th></tr></thead>
+                        <tbody>
+                            <tr><td class="text-white text-sm font-medium">Published pricing</td><td class="text-sm">4 tiers ($99&ndash;$999/mo), live checkout, annual discounts</td><td class="text-red-400 text-sm font-semibold">No pricing. Cannot purchase.</td><td class="text-xs text-zinc-500">1&ndash;2 days</td></tr>
+                            <tr><td class="text-white text-sm font-medium">Production deployment</td><td class="text-sm">Live at app.nedzo.ai + v2.nedzo.ai</td><td class="text-red-400 text-sm font-semibold">Not deployed. 132 routes ready.</td><td class="text-xs text-zinc-500">1&ndash;2 days</td></tr>
+                            <tr><td class="text-white text-sm font-medium">Paying customers</td><td class="text-sm">&ldquo;400+ Agencies joined this month&rdquo;</td><td class="text-red-400 text-sm font-semibold">Zero.</td><td class="text-xs text-zinc-500">Variable</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Critical Features -->
+            <div class="mb-8 reveal">
+                <h3 class="text-amber-400 font-semibold text-sm uppercase tracking-wider mb-4 flex items-center gap-2"><i data-lucide="alert-circle" class="w-4 h-4"></i> Critical Feature Gaps</h3>
+                <div class="glass-card p-2 md:p-4 overflow-x-auto">
+                    <table class="data-table">
+                        <thead><tr><th>Gap</th><th>Nedzo V2</th><th>Agent Vox V2</th><th>Effort</th></tr></thead>
+                        <tbody>
+                            <tr><td class="text-white text-sm font-medium">Visual flow builder</td><td class="text-sm">Drag-and-drop with branching logic</td><td class="text-red-400 text-sm">Not built</td><td class="text-xs text-zinc-500">2&ndash;3 weeks</td></tr>
+                            <tr><td class="text-white text-sm font-medium">Whitelabel UX</td><td class="text-sm">Full: custom logo, URL, branding &mdash; <strong>now real, not CSS proxy</strong></td><td class="text-amber-400 text-sm">Architecture only, no customer UI</td><td class="text-xs text-zinc-500">1&ndash;2 weeks</td></tr>
+                            <tr><td class="text-white text-sm font-medium">Rebilling</td><td class="text-sm">Built-in Stripe Connect, Agency+</td><td class="text-red-400 text-sm">Not wired</td><td class="text-xs text-zinc-500">1 week</td></tr>
+                            <tr><td class="text-white text-sm font-medium">AI Co-Pilot builder</td><td class="text-sm">Guided wizard: use case &rarr; prompt</td><td class="text-amber-400 text-sm">Prompt Coach exists (v8), no guided creation</td><td class="text-xs text-zinc-500">1 week</td></tr>
+                            <tr><td class="text-white text-sm font-medium">Multi-language</td><td class="text-sm">7 languages (EN, ES, FR, DE, NL, NO, PT)</td><td class="text-red-400 text-sm">English only</td><td class="text-xs text-zinc-500">3&ndash;5 days</td></tr>
+                            <tr><td class="text-white text-sm font-medium">Web chat widget</td><td class="text-sm">Embeddable AI widget, all plans</td><td class="text-red-400 text-sm">Not built</td><td class="text-xs text-zinc-500">1&ndash;2 weeks</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Distribution -->
+            <div class="mb-8 reveal">
+                <h3 class="text-red-400 font-semibold text-sm uppercase tracking-wider mb-4 flex items-center gap-2"><i data-lucide="megaphone" class="w-4 h-4"></i> Distribution &amp; GTM</h3>
+                <div class="glass-card p-2 md:p-4 overflow-x-auto">
+                    <table class="data-table">
+                        <thead><tr><th>Gap</th><th>Nedzo V2</th><th>Agent Vox V2</th></tr></thead>
+                        <tbody>
+                            <tr><td class="text-white text-sm font-medium">Affiliate program</td><td class="text-sm">20% recurring, 3 tiers (Tolt &mdash; same key V1&rarr;V2)</td><td class="text-red-400 text-sm">None</td></tr>
+                            <tr><td class="text-white text-sm font-medium">Community</td><td class="text-sm">Skool community + Nedzo Academy</td><td class="text-red-400 text-sm">None</td></tr>
+                            <tr><td class="text-white text-sm font-medium">Social proof</td><td class="text-sm">&ldquo;400+ Agencies&rdquo; + 4.4/5 rating + testimonials (Wojo, Colletti)</td><td class="text-red-400 text-sm">None</td></tr>
+                            <tr><td class="text-white text-sm font-medium">GHL ecosystem</td><td class="text-sm">Deep integration, primary distribution channel</td><td class="text-amber-400 text-sm">GHL integration exists, no marketplace</td></tr>
+                            <tr><td class="text-white text-sm font-medium">IVR navigation</td><td class="text-sm">Agents navigate phone menus</td><td class="text-red-400 text-sm">Not built</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Distribution callout -->
+            <div class="glass-card p-8 reveal" style="background:rgba(239,68,68,0.04);border-color:rgba(239,68,68,0.15)">
+                <div class="flex items-center gap-3 mb-3"><i data-lucide="trending-up" class="w-5 h-5 text-red-400"></i><h3 class="text-white font-semibold">The GTM Gap Is the Widest Gap</h3></div>
+                <p class="text-sm text-zinc-400">This is the widest gap in the entire analysis and it has <strong class="text-red-400">not closed at all</strong> since the V1 audit 9 days ago. Nedzo has pricing, 400+ agencies, an affiliate program carrying over to V2, and social proof. Vox has zero market presence. Additionally, Nedzo V2&rsquo;s whitelabel is now real &mdash; making their agency value prop <em>stronger</em> than V1, not weaker.</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider max-w-7xl mx-auto"></div>
+
+    <!-- HEAD-TO-HEAD MATRIX -->
+    <section id="matrix" class="py-24 relative">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16 reveal">
+                <span class="badge bg-purple-500/10 text-purple-400 border border-purple-500/20 mb-4"><i data-lucide="scale" class="w-3 h-3"></i> Feature Matrix</span>
+                <h2 class="text-3xl md:text-4xl font-bold text-gradient-white mt-4">V2 vs V2 Head-to-Head</h2>
+                <p class="text-zinc-400 mt-4 max-w-xl mx-auto">Updated for both products at their current state. March 19, 2026.</p>
+            </div>
+            <div class="glass-card p-2 md:p-4 overflow-x-auto reveal">
+                <table class="data-table">
+                    <thead><tr><th style="width:24%">Capability</th><th style="width:24%">Agent Vox V2</th><th style="width:24%">Nedzo V2</th><th style="width:12%">Winner</th><th style="width:16%">V1 Delta</th></tr></thead>
+                    <tbody>
+                        <tr><td class="text-white text-sm">Cross-call memory</td><td class="text-sm">Neo4j graph</td><td class="text-sm">None (stateless)</td><td class="win-vox text-sm">Vox</td><td class="text-xs text-zinc-600">Unchanged</td></tr>
+                        <tr><td class="text-white text-sm">Entity extraction</td><td class="text-sm">Graph-stored entities</td><td class="text-sm">Call summaries only</td><td class="win-vox text-sm">Vox</td><td class="text-xs text-zinc-600">Unchanged</td></tr>
+                        <tr><td class="text-white text-sm">A/B testing</td><td class="text-sm">Weighted variants + outcomes</td><td class="text-sm">None</td><td class="win-vox text-sm">Vox</td><td class="text-xs text-zinc-600">Unchanged</td></tr>
+                        <tr><td class="text-white text-sm">Analytics depth</td><td class="text-sm">Funnel, cohorts, costs</td><td class="text-sm">Basic reporting</td><td class="win-vox text-sm">Vox</td><td class="text-xs text-zinc-600">Unchanged</td></tr>
+                        <tr><td class="text-white text-sm">API access</td><td class="text-sm">132+ REST, OpenAPI</td><td class="text-sm">Keys exist, no docs</td><td class="win-vox text-sm">Vox</td><td class="text-xs text-zinc-600">Unchanged</td></tr>
+                        <tr><td class="text-white text-sm">SMS two-way</td><td class="text-sm">Full via Twilio</td><td class="text-sm">Post-call only</td><td class="win-vox text-sm">Vox</td><td class="text-xs text-zinc-600">Unchanged</td></tr>
+                        <tr><td class="text-white text-sm">Email channel</td><td class="text-sm">Postmark/SendGrid, HTML</td><td class="text-sm">Not mentioned</td><td class="win-vox text-sm">Vox</td><td class="text-xs text-emerald-600">New (Wave 9)</td></tr>
+                        <tr><td class="text-white text-sm">Unified inbox</td><td class="text-sm">Cross-channel timeline</td><td class="text-sm">Not mentioned</td><td class="win-vox text-sm">Vox</td><td class="text-xs text-emerald-600">New (Wave 9)</td></tr>
+                        <tr><td class="text-white text-sm">Provider choice</td><td class="text-sm">6 TTS, 5 STT, 5+ LLM</td><td class="text-sm">Opaque (via Vapi)</td><td class="win-vox text-sm">Vox</td><td class="text-xs text-zinc-600">Unchanged</td></tr>
+                        <tr><td class="text-white text-sm">Local / on-prem</td><td class="text-sm">MLX + Ollama + Chatterbox</td><td class="text-sm">Cloud-only</td><td class="win-vox text-sm">Vox</td><td class="text-xs text-zinc-600">Unchanged</td></tr>
+                        <tr><td class="text-white text-sm">Webhook security</td><td class="text-sm">HMAC-SHA256 signed</td><td class="text-sm">Basic webhooks</td><td class="win-vox text-sm">Vox</td><td class="text-xs text-zinc-600">Unchanged</td></tr>
+                        <tr><td class="text-white text-sm">Prompt coach</td><td class="text-sm">Claude analysis + apply</td><td class="text-sm">None</td><td class="win-vox text-sm">Vox</td><td class="text-xs text-emerald-600">New (v8)</td></tr>
+
+                        <tr><td class="text-white text-sm">Inbound / outbound</td><td class="text-sm">Twilio campaigns</td><td class="text-sm">Batch + scheduling</td><td class="win-tie text-sm">Tie</td><td class="text-xs text-zinc-600">Unchanged</td></tr>
+                        <tr><td class="text-white text-sm">Knowledge base</td><td class="text-sm">PDF/TXT/MD + per-turn</td><td class="text-sm">File/URL/text upload</td><td class="win-tie text-sm">Tie</td><td class="text-xs text-zinc-600">Unchanged</td></tr>
+                        <tr><td class="text-white text-sm">Background audio</td><td class="text-sm">Office/caf&eacute;/quiet</td><td class="text-sm">Office sounds</td><td class="win-tie text-sm">Tie</td><td class="text-xs text-zinc-600">Unchanged</td></tr>
+                        <tr><td class="text-white text-sm">Voicemail detection</td><td class="text-sm">AMD + auto-voicemail</td><td class="text-sm">Yes + auto-voicemail</td><td class="win-tie text-sm">Tie</td><td class="text-xs text-zinc-600">Unchanged</td></tr>
+                        <tr><td class="text-white text-sm">Live transfer</td><td class="text-sm">Warm + cold</td><td class="text-sm">Live transfer</td><td class="win-tie text-sm">Tie</td><td class="text-xs text-zinc-600">Unchanged</td></tr>
+                        <tr><td class="text-white text-sm">RBAC</td><td class="text-sm">Owner/admin/member/viewer</td><td class="text-sm">Owner/Admin/Editor/Viewer</td><td class="win-tie text-sm">Tie</td><td class="text-xs text-zinc-600">Unchanged</td></tr>
+
+                        <tr><td class="text-white text-sm">Visual flow builder</td><td class="text-sm">None</td><td class="text-sm">Drag-and-drop + branches</td><td class="win-nedzo text-sm">Nedzo</td><td class="text-xs text-zinc-600">Unchanged</td></tr>
+                        <tr><td class="text-white text-sm">Multi-language</td><td class="text-sm">English only</td><td class="text-sm">7 languages</td><td class="win-nedzo text-sm">Nedzo</td><td class="text-xs text-zinc-600">Unchanged</td></tr>
+                        <tr><td class="text-white text-sm">AI Co-Pilot</td><td class="text-sm">None</td><td class="text-sm">Guided wizard</td><td class="win-nedzo text-sm">Nedzo</td><td class="text-xs text-zinc-600">Unchanged</td></tr>
+                        <tr><td class="text-white text-sm">Web chat widget</td><td class="text-sm">None</td><td class="text-sm">Embeddable widget</td><td class="win-nedzo text-sm">Nedzo</td><td class="text-xs text-zinc-600">Unchanged</td></tr>
+                        <tr><td class="text-white text-sm">IVR navigation</td><td class="text-sm">None</td><td class="text-sm">Phone menu navigation</td><td class="win-nedzo text-sm">Nedzo</td><td class="text-xs text-zinc-600">Unchanged</td></tr>
+                        <tr><td class="text-white text-sm">Published pricing</td><td class="text-sm">None</td><td class="text-sm">$99&ndash;$999/mo live</td><td class="win-nedzo text-sm">Nedzo</td><td class="text-xs text-zinc-600">Unchanged</td></tr>
+                        <tr><td class="text-white text-sm">Whitelabel + rebilling</td><td class="text-sm">Architecture only</td><td class="text-sm">Full &mdash; now real, not proxy</td><td class="win-nedzo text-sm">Nedzo</td><td class="text-xs text-amber-500">Stronger</td></tr>
+                        <tr><td class="text-white text-sm">Community + affiliate</td><td class="text-sm">None</td><td class="text-sm">Skool + 20% affiliate</td><td class="win-nedzo text-sm">Nedzo</td><td class="text-xs text-zinc-600">Unchanged</td></tr>
+                        <tr><td class="text-white text-sm">Social proof</td><td class="text-sm">None</td><td class="text-sm">400+ agencies, testimonials</td><td class="win-nedzo text-sm">Nedzo</td><td class="text-xs text-zinc-600">Unchanged</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Score Summary -->
+            <div class="grid grid-cols-3 gap-4 mt-8 reveal">
+                <div class="glass-card p-6 text-center" style="border-color:rgba(16,185,129,0.2)">
+                    <p class="text-3xl font-bold text-emerald-400">12</p>
+                    <p class="text-xs text-zinc-500 mt-1">Agent Vox wins</p>
+                    <p class="text-xs text-zinc-600 mt-1">3 new since V1 (email, inbox, prompt coach)</p>
+                </div>
+                <div class="glass-card p-6 text-center">
+                    <p class="text-3xl font-bold text-zinc-400">6</p>
+                    <p class="text-xs text-zinc-500 mt-1">Ties</p>
+                </div>
+                <div class="glass-card p-6 text-center" style="border-color:rgba(239,68,68,0.2)">
+                    <p class="text-3xl font-bold text-red-400">9</p>
+                    <p class="text-xs text-zinc-500 mt-1">Nedzo wins</p>
+                    <p class="text-xs text-zinc-600 mt-1">Whitelabel now stronger (was proxy)</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider max-w-7xl mx-auto"></div>
+
+    <!-- STRATEGIC POSITIONING -->
+    <section id="strategy" class="py-24 relative">
+        <div class="glow-orb w-[500px] h-[500px] bg-brand-blue/8 top-[-200px] right-[-200px]"></div>
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16 reveal">
+                <span class="badge bg-brand-blue/10 text-brand-blue border border-brand-blue/20 mb-4"><i data-lucide="target" class="w-3 h-3"></i> Strategy</span>
+                <h2 class="text-3xl md:text-4xl font-bold text-gradient-white mt-4">Revised Strategic Positioning</h2>
+                <p class="text-zinc-400 mt-4 max-w-2xl mx-auto">Nedzo V2 is moving rightward and upward. The quadrant separation is shrinking.</p>
+            </div>
+
+            <!-- Quadrant Map -->
+            <div class="glass-card p-8 mb-8 reveal">
+                <h3 class="text-white font-semibold text-lg mb-6 text-center">Market Positioning Map &mdash; Updated for V2</h3>
+                <div class="relative max-w-2xl mx-auto">
+                    <div class="grid grid-cols-2 gap-0 border border-white/10 rounded-xl overflow-hidden" style="min-height:320px">
+                        <!-- Top-left -->
+                        <div class="p-6 border-r border-b border-white/10 bg-white/[0.01]">
+                            <p class="text-[10px] uppercase tracking-wider text-zinc-600 mb-4">Developer &middot; Simple</p>
+                            <div class="space-y-2">
+                                <span class="inline-block px-3 py-1 rounded-full text-xs bg-zinc-800 text-zinc-400">Vapi</span>
+                                <span class="inline-block px-3 py-1 rounded-full text-xs bg-zinc-800 text-zinc-400">Bland AI</span>
+                                <span class="inline-block px-3 py-1 rounded-full text-xs bg-zinc-800 text-zinc-400">Retell</span>
+                            </div>
+                        </div>
+                        <!-- Top-right -->
+                        <div class="p-6 border-b border-white/10 bg-brand-blue/[0.03]">
+                            <p class="text-[10px] uppercase tracking-wider text-zinc-600 mb-4">Developer &middot; Intelligent</p>
+                            <div class="space-y-2">
+                                <span class="inline-block px-3 py-1.5 rounded-full text-xs bg-brand-blue/20 text-brand-blue font-semibold border border-brand-blue/30">Agent Vox</span>
+                            </div>
+                        </div>
+                        <!-- Bottom-left -->
+                        <div class="p-6 border-r border-white/10 bg-white/[0.01]">
+                            <p class="text-[10px] uppercase tracking-wider text-zinc-600 mb-4">No-Code &middot; Simple</p>
+                            <div class="space-y-2">
+                                <span class="inline-block px-3 py-1 rounded-full text-xs bg-zinc-800 text-zinc-400">Synthflow</span>
+                                <span class="inline-block px-3 py-1 rounded-full text-xs bg-zinc-800 text-zinc-400">Callin.io</span>
+                            </div>
+                        </div>
+                        <!-- Bottom-right -->
+                        <div class="p-6 bg-amber-500/[0.02] relative">
+                            <p class="text-[10px] uppercase tracking-wider text-zinc-600 mb-4">No-Code &middot; Capable</p>
+                            <div class="space-y-2">
+                                <span class="inline-block px-3 py-1 rounded-full text-xs bg-red-500/10 text-red-400 border border-red-500/20">Nedzo V2</span>
+                                <div class="mt-3"><i data-lucide="move-up-right" class="w-4 h-4 text-amber-400 inline"></i><span class="text-xs text-amber-400 ml-1">Moving from bottom-left</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-xs text-zinc-500 text-center mt-4">Nedzo V1 was firmly bottom-left (no-code, simple). V2&rsquo;s custom codebase moves them toward more capable &mdash; the gap is narrowing.</p>
+            </div>
+
+            <!-- The Narrative -->
+            <div class="glass-card p-10 mb-8 reveal text-center" style="border-color:rgba(59,130,246,0.2)">
+                <p class="text-2xl md:text-3xl font-bold text-white leading-snug max-w-3xl mx-auto">&ldquo;Against V1, we could win on technology alone.<br><span class="text-gradient-blue">Against V2, the only moat is intelligence.</span>&rdquo;</p>
+                <p class="text-sm text-zinc-500 mt-6">Technology parity means the competition shifts to: (1) intelligence &mdash; graph memory, (2) distribution &mdash; GTM, and (3) speed to market &mdash; whoever gets the next 100 agencies.</p>
+            </div>
+
+            <!-- Priority Roadmap -->
+            <div class="reveal">
+                <h3 class="text-white font-semibold text-lg mb-6 text-center">Revised Priority Roadmap</h3>
+                <div class="grid md:grid-cols-4 gap-6">
+                    <div class="glass-card p-8" style="border-color:rgba(239,68,68,0.2)">
+                        <div class="flex items-center gap-3 mb-4"><div class="w-10 h-10 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center"><span class="text-red-400 font-bold text-sm">P0</span></div><div><h4 class="text-white font-semibold text-sm">Existential</h4><p class="text-xs text-zinc-500">This week</p></div></div>
+                        <ul class="space-y-2 text-xs text-zinc-400">
+                            <li class="flex items-start gap-2"><i data-lucide="circle-dot" class="w-3 h-3 text-red-400 mt-0.5"></i> Deploy to production (Render)</li>
+                            <li class="flex items-start gap-2"><i data-lucide="circle-dot" class="w-3 h-3 text-red-400 mt-0.5"></i> Published pricing page</li>
+                            <li class="flex items-start gap-2"><i data-lucide="circle-dot" class="w-3 h-3 text-red-400 mt-0.5"></i> First paying customer</li>
+                            <li class="flex items-start gap-2"><i data-lucide="circle-dot" class="w-3 h-3 text-red-400 mt-0.5"></i> Graph memory demo (public)</li>
+                        </ul>
+                        <p class="text-[10px] text-red-400/60 mt-3 italic">9 days unchanged. This is the fire.</p>
+                    </div>
+                    <div class="glass-card p-8">
+                        <div class="flex items-center gap-3 mb-4"><div class="w-10 h-10 rounded-full bg-brand-blue/10 border border-brand-blue/20 flex items-center justify-center"><span class="text-brand-blue font-bold text-sm">P1</span></div><div><h4 class="text-white font-semibold text-sm">Competitive</h4><p class="text-xs text-zinc-500">This month</p></div></div>
+                        <ul class="space-y-2 text-xs text-zinc-400">
+                            <li class="flex items-start gap-2"><i data-lucide="check" class="w-3 h-3 text-brand-blue mt-0.5"></i> Visual flow builder (v1)</li>
+                            <li class="flex items-start gap-2"><i data-lucide="check" class="w-3 h-3 text-brand-blue mt-0.5"></i> Whitelabel UX + Stripe Connect</li>
+                            <li class="flex items-start gap-2"><i data-lucide="check" class="w-3 h-3 text-brand-blue mt-0.5"></i> Multi-language (ES, FR, DE)</li>
+                            <li class="flex items-start gap-2"><i data-lucide="check" class="w-3 h-3 text-brand-blue mt-0.5"></i> GTM: affiliate + community</li>
+                        </ul>
+                    </div>
+                    <div class="glass-card p-8">
+                        <div class="flex items-center gap-3 mb-4"><div class="w-10 h-10 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center"><span class="text-emerald-400 font-bold text-sm">P2</span></div><div><h4 class="text-white font-semibold text-sm">Differentiation</h4><p class="text-xs text-zinc-500">6 weeks</p></div></div>
+                        <ul class="space-y-2 text-xs text-zinc-400">
+                            <li class="flex items-start gap-2"><i data-lucide="check" class="w-3 h-3 text-emerald-400 mt-0.5"></i> AI Co-Pilot builder</li>
+                            <li class="flex items-start gap-2"><i data-lucide="check" class="w-3 h-3 text-emerald-400 mt-0.5"></i> Web chat widget</li>
+                            <li class="flex items-start gap-2"><i data-lucide="check" class="w-3 h-3 text-emerald-400 mt-0.5"></i> Outcome-based pricing</li>
+                            <li class="flex items-start gap-2"><i data-lucide="check" class="w-3 h-3 text-emerald-400 mt-0.5"></i> CRM breadth (Pipedrive, etc.)</li>
+                        </ul>
+                    </div>
+                    <div class="glass-card p-8">
+                        <div class="flex items-center gap-3 mb-4"><div class="w-10 h-10 rounded-full bg-purple-500/10 border border-purple-500/20 flex items-center justify-center"><span class="text-purple-400 font-bold text-sm">P3</span></div><div><h4 class="text-white font-semibold text-sm">Deepen the Moat</h4><p class="text-xs text-zinc-500">Ongoing</p></div></div>
+                        <ul class="space-y-2 text-xs text-zinc-400">
+                            <li class="flex items-start gap-2"><i data-lucide="check" class="w-3 h-3 text-purple-400 mt-0.5"></i> Cross-call analytics ROI</li>
+                            <li class="flex items-start gap-2"><i data-lucide="check" class="w-3 h-3 text-purple-400 mt-0.5"></i> Objection pattern analysis</li>
+                            <li class="flex items-start gap-2"><i data-lucide="check" class="w-3 h-3 text-purple-400 mt-0.5"></i> Predictive close scoring</li>
+                            <li class="flex items-start gap-2"><i data-lucide="check" class="w-3 h-3 text-purple-400 mt-0.5"></i> IVR navigation</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider max-w-7xl mx-auto"></div>
+
+    <!-- BOTTOM LINE -->
+    <section class="py-24 relative">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="glass-card p-10 md:p-16 text-center reveal" style="border-color:rgba(59,130,246,0.15)">
+                <h2 class="text-3xl md:text-4xl font-bold text-gradient-white mb-6">The Bottom Line</h2>
+                <p class="text-lg text-zinc-400 max-w-3xl mx-auto leading-relaxed mb-8"><strong class="text-white">The game has changed.</strong> Against Nedzo V1, Vox could win on technology &mdash; better stack, better architecture, plus graph memory. Against V2, technology is near-parity except for graph memory. The moat has narrowed from <strong class="text-zinc-300">&ldquo;better tech + intelligence&rdquo;</strong> to <strong class="text-zinc-300">&ldquo;intelligence alone.&rdquo;</strong></p>
+                <p class="text-lg text-zinc-400 max-w-3xl mx-auto leading-relaxed mb-10">That moat is real &mdash; but <strong class="text-amber-400">invisible moats don&rsquo;t sell.</strong> The path forward is not more features. It&rsquo;s:</p>
+                <div class="grid md:grid-cols-4 gap-4 max-w-3xl mx-auto mb-10">
+                    <div class="p-5 rounded-xl bg-white/[0.03] border border-white/10 text-center">
+                        <p class="text-2xl font-bold text-white mb-1">Deploy</p>
+                        <p class="text-xs text-zinc-500">132 routes, 160 tests, ready today</p>
+                    </div>
+                    <div class="p-5 rounded-xl bg-white/[0.03] border border-white/10 text-center">
+                        <p class="text-2xl font-bold text-white mb-1">Price</p>
+                        <p class="text-xs text-zinc-500">Even imperfectly &mdash; a wrong price beats no price</p>
+                    </div>
+                    <div class="p-5 rounded-xl bg-white/[0.03] border border-white/10 text-center">
+                        <p class="text-2xl font-bold text-white mb-1">Prove</p>
+                        <p class="text-xs text-zinc-500">Demo graph memory ROI publicly</p>
+                    </div>
+                    <div class="p-5 rounded-xl bg-white/[0.03] border border-white/10 text-center">
+                        <p class="text-2xl font-bold text-white mb-1">Distribute</p>
+                        <p class="text-xs text-zinc-500">Affiliate, community, GHL marketplace</p>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+                    <div class="p-6 rounded-xl bg-red-500/5 border border-red-500/10">
+                        <p class="text-red-400 text-xs font-bold uppercase tracking-wider mb-2">Nedzo V2</p>
+                        <p class="text-white font-semibold">Commodity voice + real infrastructure + agency GTM</p>
+                        <p class="text-xs text-zinc-500 mt-2">Shallow product, deep distribution. Now on a real codebase.</p>
+                    </div>
+                    <div class="p-6 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
+                        <p class="text-emerald-400 text-xs font-bold uppercase tracking-wider mb-2">Agent Vox V2</p>
+                        <p class="text-white font-semibold">Intelligence platform with no market presence</p>
+                        <p class="text-xs text-zinc-500 mt-2">Deep product, zero distribution. The buy button is the bottleneck.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="py-16 border-t border-white/5">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <p class="text-zinc-600 text-sm">V2 competitive gap analysis. Based on v2.nedzo.ai scrape (March 10, 2026), nedzo-competitive-audit-plan.md, Agent Vox codebase at Wave 10 (March 19, 2026). Internal document.</p>
+            <div class="flex justify-center gap-8 mt-8 text-xs text-zinc-600">
+                <span>Meridian Technologies</span>
+                <span>&bull;</span>
+                <span>Sensei &mdash; Coherence Director</span>
+                <span>&bull;</span>
+                <span>March 19, 2026</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    </script>
+</body>
+</html>
